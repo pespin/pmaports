@@ -1,30 +1,37 @@
 pkgname=firmware-fairphone-fp3
-pkgver=20210420.0
+pkgver=20210805
+_commit="a46fb8c68fbe18c40eb138fc754e263aa6ece5ad"
 pkgrel=0
 pkgdesc="Firmware for Fairphone 3"
-url="https://gitlab.com/knfr/firmware-fairphone-fp3"
+url="https://github.com/FairBlobs/FP3-firmware"
 arch="aarch64"
 license="proprietary"
-subpackages="$pkgname-wcnss"
+subpackages="$pkgname-adreno $pkgname-wcnss"
 options="!check !strip !archcheck !tracedeps pmb:cross-native"
-
-source="$pkgname-$pkgver.tar.gz::$url/-/archive/$pkgver/$pkgname-$pkgver.tar.gz"
+source="https://github.com/FairBlobs/FP3-firmware/archive/$_commit/$pkgname-$_commit.tar.gz"
+builddir="$srcdir/FP3-firmware-$_commit"
 _fwdir="/lib/firmware/postmarketos"
 
 package() {
 	mkdir -p "$pkgdir"
 }
 
+adreno() {
+	pkgdesc="Fairphone 3 firmware for GPU"
+
+	install -Dm644 "$builddir"/a506_zap.mdt -t \
+		"$subpkgdir/$_fwdir"
+	install -Dm644 "$builddir"/a506_zap.b* -t \
+		"$subpkgdir/$_fwdir"
+}
+
 wcnss() {
 	pkgdesc="Fairphone 3 firmware for the Qualcomm Wireless Connectivity Subsystem (WCNSS)"
-	depends="wcnss-wlan"
 
-	install -Dm644 "$builddir"/wcnss.* -t \
-		"$subpkgdir/$_fwdir"
-	install -Dm644 "$builddir"/prima/* -t \
+	install -Dm644 "$builddir"/wlan/prima/* -t \
 		"$subpkgdir/$_fwdir"/wlan/prima
 }
 
 sha512sums="
-bf2aea11343a4c0cd0f7a6d7ac7304674f2eb565ebe78dc1020e7756d9ee13c8fc45ff03e5c4d8f532528c2d613834603dbf01f68944ec8faeb08b3bc7d86470  firmware-fairphone-fp3-20210420.0.tar.gz
+5cdae1c05f68689f6d258ac16faccb6733d0841f8bc22a0ce8c602a44fa1ada69b6b2158970685ad12b0a1e9dfe30e5c140223257b971a64eae36bad71954ceb  firmware-fairphone-fp3-a46fb8c68fbe18c40eb138fc754e263aa6ece5ad.tar.gz
 "
