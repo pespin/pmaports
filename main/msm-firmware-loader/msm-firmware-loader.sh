@@ -22,6 +22,7 @@
 FW_PARTITIONS="
 	apnhlos
 	modem
+	modem_a
 "
 
 # Base dirrectory to be used to unfold the partitions into.
