@@ -5,7 +5,7 @@
 # https://gitlab.alpinelinux.org/alpine/apk-tools/-/issues/10712
 pkgname=osk-sdl
 pkgver=0.66
-pkgrel=0
+pkgrel=1
 pkgdesc="Onscreen keyboard for unlocking LUKS devices"
 url="https://gitlab.com/postmarketOS/osk-sdl"
 arch="all"
@@ -32,6 +32,7 @@ provides="postmarketos-fde-unlocker"
 provider_priority=1000
 
 build() {
+	export CFLAGS="-DCRYPT_ACTIVATE_NO_READ_WORKQUEUE -DCRYPT_ACTIVATE_NO_WRITE_WORKQUEUE"
 	abuild-meson build
 	meson compile ${JOBS:+-j ${JOBS}} -C build
 }
