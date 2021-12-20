@@ -1,0 +1,68 @@
+From 53195a4ffa1d93f00e0e0dc11be885ff645a0833 Mon Sep 17 00:00:00 2001
+From: Arnaud Ferraris <arnaud.ferraris@gmail.com>
+Date: Tue, 4 Jan 2022 15:26:43 +0100
+Subject: [PATCH 3/6] udev: use USB vendor/product ID to determine behavior
+
+When going into firmware upgrade mode, the modem comes back with
+different IDs than in normal use. We should make sure we cancel the
+reset sequence when that happens, and not start a new one.
+---
+ src/udev.c | 33 ++++++++++++++++++++++++++-------
+ 1 file changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/src/udev.c b/src/udev.c
+index a2e62a3..f371472 100644
+--- a/src/udev.c
++++ b/src/udev.c
+@@ -11,22 +11,41 @@
+ static void udev_event_cb(GUdevClient *client, gchar *action, GUdevDevice *device, gpointer data)
+ {
+     struct EG25Manager *manager = data;
++    const gchar *prop;
++    long vid = 0, pid = 0;
+ 
+-    if (!manager->modem_usb_id)
++    /*
++     * Act only if the device is the one identified as a modem by MM/ofono
++     */
++    if (!manager->modem_usb_id ||
++        strcmp(g_udev_device_get_name(device), manager->modem_usb_id) != 0) {
+         return;
++    }
++
++    prop = g_udev_device_get_property(device, "ID_VENDOR_ID");
++    if (prop)
++        vid = strtol(prop, NULL, 16);
+ 
+-    if (strcmp(g_udev_device_get_name(device), manager->modem_usb_id) == 0 &&
+-        strcmp(action, "add") == 0 && manager->schedule_reset_timer != 0) {
+-        g_message("Modem recovered before reset sequence was triggered, cancel reset.");
+-        g_source_remove(manager->schedule_reset_timer);
+-        manager->schedule_reset_timer = 0;
++    prop = g_udev_device_get_property(device, "ID_MODEL_ID");
++    if (prop)
++        pid = strtol(prop, NULL, 16);
++
++    if (vid != manager->usb_vid && pid != manager->usb_pid) {
++        if (strcmp(action, "add") == 0 && manager->schedule_reset_timer != 0) {
++            /*
++             * Modem is probably executing a FW upgrade, make sure we don't interrupt it
++             */
++            g_message("Modem re-appeared with different VID/PID, cancel reset.");
++            g_source_remove(manager->schedule_reset_timer);
++            manager->schedule_reset_timer = 0;
++        }
+         return;
+     }
+ 
+     if (strcmp(action, "unbind") != 0 ||
+         manager->modem_state == EG25_STATE_RESETTING ||
+         manager->complete_reset_timer != 0 ||
+-        strcmp(g_udev_device_get_name(device), manager->modem_usb_id) != 0) {
++        manager->schedule_reset_timer != 0) {
+         return;
+     }
+ 
+-- 
+2.34.1
+

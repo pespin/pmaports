@@ -1,0 +1,55 @@
+# Forked from Alpine to avoid resetting during modem upgrade
+
+pkgname=eg25-manager
+pkgver=9999
+pkgrel=0
+pkgdesc="Daemon for managing the Quectel EG25 modem"
+url="https://gitlab.com/mobian1/devices/eg25-manager"
+# s390x, mips64 and riscv64 blocked by polkit -> modemmanager
+arch="all !s390x !mips64 !riscv64"
+license="GPL-3.0-or-later"
+makedepends="
+	curl-dev
+	glib-dev
+	libgpiod-dev
+	libgudev-dev
+	libusb-dev
+	meson
+	modemmanager-dev
+	"
+_commit="9cf51b9529f150e8f43582cbc44bc493b986f7e9"
+source="
+	https://gitlab.com/mobian1/devices/eg25-manager/-/archive/$_commit/eg25-manager-$_commit.tar.gz
+	eg25-manager.confd
+	eg25-manager.initd
+	0001-udev-cancel-reset-if-modem-is-already-back.patch
+	0002-manager-populate-USB-vendor-product-ID-s-with-defaul.patch
+	0003-udev-use-USB-vendor-product-ID-to-determine-behavior.patch
+	0004-manager-disable-reset-timers-once-reset-sequence-sta.patch
+	0005-data-add-USB-vendor-product-IDs-to-all-configs.patch
+	"
+options="!check"  # no tests
+subpackages="$pkgname-openrc"
+builddir="$srcdir/$pkgname-$_commit"
+
+build() {
+	abuild-meson . output
+	meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+	DESTDIR="$pkgdir" meson install --no-rebuild -C output
+	install -Dm755 "$srcdir"/eg25-manager.initd "$pkgdir"/etc/init.d/eg25-manager
+	install -Dm644 "$srcdir"/eg25-manager.confd "$pkgdir"/etc/conf.d/eg25-manager
+}
+
+sha512sums="
+d780ace0ae8b294f777ecda66279aacfbcb97da6487e7377276e98b097604969d8b793fedef391937ded0d069c9b910adf4a0374fbbe509b47e269d9cc2b5289  eg25-manager-9cf51b9529f150e8f43582cbc44bc493b986f7e9.tar.gz
+55936830afad2968a214fb39cfe1a9db50421dc2ff4f67d04f08f6bd2b094c3ab46799cfc7743bbc5032682d98d1216203adf5264353a05134bea58524ac070b  eg25-manager.confd
+6422ffb1014fee5315fbc82f811471e9bdef7e6bfedfd97c9e1928ff5dd2c761df8d3c54c05e132063365861e224cf344500ae6809fd2172795f48c7b6b483c8  eg25-manager.initd
+542da3b7111ddb36010284aafa57457a6b4a617567d5b2daacb652ae1cdb8e091c6d6379def4e001279bf576b20d842ed76583168a44936ebd2459f9e3a4577c  0001-udev-cancel-reset-if-modem-is-already-back.patch
+ba67cea00c49814c909d2d98a0b8c0976bc787dbd0e40c1b6775ecc67714c70665b626fb1468a57ce92535f6b97e430baa647c1b248a9e7a94141481d6e741d3  0002-manager-populate-USB-vendor-product-ID-s-with-defaul.patch
+73e4f2179bbcbd003d8cdc1fc459926a4a8339f5a4f2d88dd1e8c31a0e76fc70433a851c6cdf6fd5088c4ce0d95cab8c7a8ba4d7436743c239992fde1a22fc4b  0003-udev-use-USB-vendor-product-ID-to-determine-behavior.patch
+69ae77515155ebb1cb0579c9da2cfe2246f067c7ee7461d1bad1f093498ff1fb151d6693de7c17fccd2153dd1666709e9e5e8a4d864550b303ebdb50491d2821  0004-manager-disable-reset-timers-once-reset-sequence-sta.patch
+8ecbc2df1eee990b7335eea10ca8a2d66456f73aac13b52eea78f043dfe120eab314830276d116cdf4cde7058700bd50aab80de5a2d83cd3ffc8228224d6369c  0005-data-add-USB-vendor-product-IDs-to-all-configs.patch
+"

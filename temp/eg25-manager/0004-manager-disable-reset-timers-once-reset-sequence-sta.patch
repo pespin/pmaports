@@ -1,0 +1,48 @@
+From 39d6f1893caa90b3f2eacf8252dd9f02314ca960 Mon Sep 17 00:00:00 2001
+From: Arnaud Ferraris <arnaud.ferraris@gmail.com>
+Date: Tue, 4 Jan 2022 15:28:12 +0100
+Subject: [PATCH 4/6] manager: disable reset timers once reset sequence starts
+
+`modem_reset()` can be called from multiple places, both tied to a
+specific timer. In order to prevent calling this function multiple times
+in a row, disable all related timers as soon as we enter this function.
+---
+ src/manager.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/src/manager.c b/src/manager.c
+index 9c33e3f..47cbc11 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -153,7 +153,15 @@ gboolean modem_reset(struct EG25Manager *manager)
+     int fd, ret, len;
+ 
+     /* reset sequence started, cannot be canceled anymore */
+-    manager->schedule_reset_timer = 0;
++    if (manager->schedule_reset_timer) {
++        g_source_remove(manager->schedule_reset_timer);
++        manager->schedule_reset_timer = 0;
++    }
++
++    if (manager->modem_recovery_timer) {
++        g_source_remove(manager->modem_recovery_timer);
++        manager->modem_recovery_timer = 0;
++    }
+ 
+     if (manager->complete_reset_timer) {
+         g_message("modem_reset: timer already setup, skipping...");
+@@ -170,11 +178,6 @@ gboolean modem_reset(struct EG25Manager *manager)
+         return G_SOURCE_REMOVE;
+     }
+ 
+-    if (manager->modem_recovery_timer) {
+-        g_source_remove(manager->modem_recovery_timer);
+-        manager->modem_recovery_timer = 0;
+-    }
+-
+     if (!manager->modem_usb_id) {
+         g_warning("Empty modem USB ID");
+         goto error;
+-- 
+2.34.1
+

@@ -1,0 +1,64 @@
+From 220cb94907fdcda179cf62e4674016463c2de91d Mon Sep 17 00:00:00 2001
+From: Arnaud Ferraris <arnaud.ferraris@gmail.com>
+Date: Tue, 4 Jan 2022 15:29:56 +0100
+Subject: [PATCH 5/6] data: add USB vendor/product IDs to all configs
+
+PP 1.2 and PPP configs were lacking this parameter. Although it's not a
+problem as `eg25-manager` will then use a default value, adding them
+won't harm and make them more consistent with other config files.
+---
+ data/pine64,pinephone-1.2.toml | 6 ++++--
+ data/pine64,pinephone-pro.toml | 6 ++++--
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/data/pine64,pinephone-1.2.toml b/data/pine64,pinephone-1.2.toml
+index b3fd6f5..6f06084 100644
+--- a/data/pine64,pinephone-1.2.toml
++++ b/data/pine64,pinephone-1.2.toml
+@@ -1,5 +1,7 @@
+ [manager]
+ monitor_udev = true
++usb_vid = 0x2c7c
++usb_pid = 0x0125
+ # Delay between setting GPIO and PWRKEY sequence, set in microseconds
+ poweron_delay = 100000
+ 
+@@ -61,9 +63,9 @@ configure = [
+     { cmd = "QSCLK", value = "1" },
+ # GNSS configuration:
+ #   * Enable A-GPS data upload support (XTRA)
+-#   * Disable On-Demand-Positioning (ODP) mode 
++#   * Disable On-Demand-Positioning (ODP) mode
+ #     to avoid running the GNSS system in the background, even when not enabled.
+-#   * Enable Dynamic Power Optimizations (DPO) mode to turn off GNSS RF radios 
++#   * Enable Dynamic Power Optimizations (DPO) mode to turn off GNSS RF radios
+ #     when they are not in use.
+ #   * Only enable GPS and GLONASS, disable other GNSS systems.
+ #     A-GPS data upload doesn't work for Galileo anyway.
+diff --git a/data/pine64,pinephone-pro.toml b/data/pine64,pinephone-pro.toml
+index f3f1733..6b1348f 100644
+--- a/data/pine64,pinephone-pro.toml
++++ b/data/pine64,pinephone-pro.toml
+@@ -1,5 +1,7 @@
+ [manager]
+ monitor_udev = false
++usb_vid = 0x2c7c
++usb_pid = 0x0125
+ # Delay between setting GPIO and PWRKEY sequence, set in microseconds
+ poweron_delay = 100000
+ 
+@@ -61,9 +63,9 @@ configure = [
+     { cmd = "QSCLK", value = "1" },
+ # GNSS configuration:
+ #   * Enable A-GPS data upload support (XTRA)
+-#   * Disable On-Demand-Positioning (ODP) mode 
++#   * Disable On-Demand-Positioning (ODP) mode
+ #     to avoid running the GNSS system in the background, even when not enabled.
+-#   * Enable Dynamic Power Optimizations (DPO) mode to turn off GNSS RF radios 
++#   * Enable Dynamic Power Optimizations (DPO) mode to turn off GNSS RF radios
+ #     when they are not in use.
+ #   * Only enable GPS and GLONASS, disable other GNSS systems.
+ #     A-GPS data upload doesn't work for Galileo anyway.
+-- 
+2.34.1
+

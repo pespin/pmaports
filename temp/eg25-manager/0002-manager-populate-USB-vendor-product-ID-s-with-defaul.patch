@@ -1,0 +1,44 @@
+From df7924782160aca6939c29b5b822d388c6a4eb6a Mon Sep 17 00:00:00 2001
+From: Arnaud Ferraris <arnaud.ferraris@gmail.com>
+Date: Tue, 4 Jan 2022 15:24:01 +0100
+Subject: [PATCH 2/6] manager: populate USB vendor/product ID's with default
+ values
+
+We'll need those in the `udev` module, but never made it a mandatory
+config option. This commit makes sure those values are properly filled
+in.
+---
+ src/manager.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/manager.c b/src/manager.c
+index 191dd53..9c33e3f 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -38,6 +38,9 @@
+ #define EG25_VERSION "0.0.0"
+ #endif
+ 
++#define EG25_DEFAULT_VENDOR_ID  0x2c7c
++#define EG25_DEFAULT_PRODUCT_ID 0x0125
++
+ #define POWERON_DELAY_US 100000UL
+ 
+ static gboolean quit_app(struct EG25Manager *manager)
+@@ -369,9 +372,11 @@ int main(int argc, char *argv[])
+ 
+     config_get_bool(manager_config, "monitor_udev", &monitor_udev);
+     config_get_bool(manager_config, "need_libusb", &manager.use_libusb);
+-    config_get_uint(manager_config, "usb_vid", &manager.usb_vid);
+-    config_get_uint(manager_config, "usb_pid", &manager.usb_pid);
+     config_get_uint(manager_config, "poweron_delay", &manager.poweron_delay);
++    if (!config_get_uint(manager_config, "usb_vid", &manager.usb_vid))
++        manager.usb_vid = EG25_DEFAULT_VENDOR_ID;
++    if (!config_get_uint(manager_config, "usb_pid", &manager.usb_pid))
++        manager.usb_pid = EG25_DEFAULT_PRODUCT_ID;
+ 
+     at_init(&manager, toml_config);
+     gpio_init(&manager, toml_config);
+-- 
+2.34.1
+
