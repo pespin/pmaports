@@ -59,7 +59,7 @@ checkdepends="
 	librsvg
 	gdk-pixbuf
 	"
-source="https://source.puri.sm/Librem5/gtk/-/archive/$_commit/gtk-$_commit.tar.gz
+source="https://source.puri.sm/Librem5/debs/gtk/-/archive/$_commit/gtk-$_commit.tar.gz
 	"
 
 builddir="$srcdir/gtk-$_commit"
