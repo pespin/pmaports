@@ -9,6 +9,7 @@ depends="
 	alpine-base
 	eudev
 	openssh
+	postmarketos-bootsplash
 	postmarketos-mkinitfs
 	postmarketos-mvcfg
 	postmarketos-keys
