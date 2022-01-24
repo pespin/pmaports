@@ -35,7 +35,7 @@ setup_usb_network
 start_unudhcpd
 
 mount_boot_partition /boot
-show_splash_loading
+show_splash "loading..."
 extract_initramfs_extra /boot/initramfs-extra
 # charging-sdl does not work properly at the moment, so skip it.
 # See also https://gitlab.com/postmarketOS/pmaports/-/issues/1064
