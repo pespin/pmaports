@@ -1,0 +1,26 @@
+# WARNING: Could not get a description from sourcehut
+# WARNING: Could not get a license from sourcehut
+# WARNING: Could not find provider for depends('tfblib')
+pkgname=pbsplash
+pkgdesc="postmarketOS boot splash screen"
+pkgver=0.1
+pkgrel=1
+url="https://git.sr.ht/~calebccff/pbsplash"
+arch="all"
+options="!check" # no testsuite
+license="GPL-3.0"
+source="$pkgname-$pkgver.tar.gz::https://git.sr.ht/~calebccff/pbsplash/archive/$pkgver.tar.gz"
+makedepends="meson tfblib"
+
+build() {
+        abuild-meson . output
+        meson compile ${JOBS:+-j ${JOBS}} -C output
+}
+
+package() {
+        DESTDIR="$pkgdir" meson install --no-rebuild -C output
+}
+
+sha512sums="
+b7f8f50287ea9dc466f9f77b990441fe4ebf7f3c95ef061a2a5c8ea4b66a2c30d70c54da581d655947ee85f728f9df846355a751bdc746d4ee1714248ca3a9eb  pbsplash-0.1.tar.gz
+"
