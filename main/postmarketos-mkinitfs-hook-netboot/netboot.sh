@@ -8,7 +8,7 @@ NBD_IP=172.16.42.2
 setup_usb_network
 start_unudhcpd
 
-show_splash /splash-netboot-waiting.ppm.gz
+show_splash "Waiting for netboot..."
 
 # Attempt to load the kernel module if CONFIG_BLK_DEV_NBD=m
 modprobe nbd
@@ -16,7 +16,7 @@ modprobe nbd
 # Check that we actually have nbd0 available, otherwise show an error screen.
 if [ ! -b /dev/nbd0 ]; then
 	echo "Failed to get /dev/nbd0, stopping."
-	show_splash /splash-netboot-error.ppm.gz
+	show_splash "Failed to initialise netboot"
 	pmos_loop_forever
 fi
 
