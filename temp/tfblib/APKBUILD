@@ -1,0 +1,30 @@
+# Maintainer: Caleb Connolly <caleb@connolly.tech>
+# Contributor Caleb Connolly <caleb@connolly.tech>
+pkgname=tfblib
+pkgver=0.1
+pkgrel=2
+_commit="d5dc787eaa8f3a257d45e59451260331ad5198fb"
+pkgdesc="A Tiny Linux Framebuffer Library"
+url="https://github.com/vvaltchev/tfblib"
+arch="all"
+license="BSD-2-Clause"
+options="!check" # no testsuite
+source="https://github.com/vvaltchev/tfblib/archive/$_commit/tfblib-$_commit.tar.gz"
+makedepends="cmake linux-headers"
+builddir="$srcdir/$pkgname-$_commit"
+
+build() {
+	cmake -B build \
+		-DCMAKE_INSTALL_PREFIX=/usr \
+		-DCMAKE_INSTALL_LIBDIR=lib \
+		-DCMAKE_BUILD_TYPE=MinSizeRel
+	cmake --build build
+}
+
+package() {
+	DESTDIR="$pkgdir" cmake --install build
+}
+
+sha512sums="
+661ebbb54cf4e3036c4231664d98b60bed489ada29a8d1f7b3cb59b3f1141f39bd1222ff79260f4ee04787774c51f191dc9fbdb3eb3305123656419f838e52e5  tfblib-d5dc787eaa8f3a257d45e59451260331ad5198fb.tar.gz
+"
