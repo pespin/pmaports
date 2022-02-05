@@ -1,0 +1,37 @@
+# Maintainer: Caleb Connolly <caleb@connolly.tech>
+pkgname=firmware-pine64-pinenote
+pkgver=1
+pkgrel=0
+pkgdesc="Firmware for OnePlus 5/5T"
+url="https://gitlab.com/calebccff/firmware-pine64-pinenote"
+arch="aarch64"
+license="proprietary"
+options="!check !archcheck !strip !tracedeps pmb:cross-native"
+_commit="6676e4cabf5f68062da86ef528ac033507f02529"
+source="https://gitlab.com/calebccff/firmware-pine64-pinenote/-/archive/$_commit/firmware-pine64-pinenote-$_commit.tar.gz
+	30-eink-waveform.files
+	splash.ini
+"
+install="$pkgname.post-install
+	$pkgname.post-upgrade"
+
+package() {
+	install -Dm644 "$srcdir/30-eink-waveform.files" \
+		"$pkgdir/etc/postmarketos-mkinitfs/files/30-eink-waveform.files"
+
+	install -D -m644 "$srcdir"/splash.ini \
+		"$pkgdir"/etc/postmarketos/splash.pinenote.ini
+
+	cd "$srcdir/$pkgname-$_commit/"
+	install -Dm644 waveform.bin "$pkgdir"/lib/firmware/waveform.bin
+	install -Dm644 brcm/BCM4345C0_cy.hcd "$pkgdir"/lib/firmware/brcm/BCM4345C0_cy.hcd
+	install -Dm644 brcm/BCM4345C0.hcd "$pkgdir"/lib/firmware/brcm/BCM4345C0.hcd
+	install -Dm644 brcm/fw_bcm43455c0_ag_cy.bin "$pkgdir"/lib/firmware/brcm/brcmfmac43455-sdio.bin
+	install -Dm644 brcm/nvram_ap6255_cy.txt "$pkgdir"/lib/firmware/brcm/brcmfmac43455-sdio.txt
+}
+
+sha512sums="
+645df0df980a2595f6d7afc2a2477c1754a8e23f10a35f656c03410ad2e0e932d1501e648fcf8f1b22cf0c1e7b24b9a3eab3304780622701e343b89580ee1a54  firmware-pine64-pinenote-6676e4cabf5f68062da86ef528ac033507f02529.tar.gz
+ac55feed7d5e719ef6aa0e04021e1a8f7d7f9bf87d9b1287f444f598e85d627c5f4b2dee83b0149f76ccdb5867003728675f72602972b01a215868a7abbfd526  30-eink-waveform.files
+563004dda7c4614a99e513e742746b19cda045a9cad30b5b86727e808a289748390dc24816cc5e47849650c69566e8d82ee8d1e23ded8f1c7e5b7d6c55874d3f  splash.ini
+"

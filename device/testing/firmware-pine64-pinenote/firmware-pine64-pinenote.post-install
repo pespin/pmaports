@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# The postmarketos-splash package used during build has no way to
+# specify a custom config, but we need an inverted on for e-ink.
+# this works and avoids conflicts.
+# This will be removed once the new runtime splash is available.
+mv /etc/postmarketos/splash.pinenote.ini /etc/postmarketos/splash.ini
